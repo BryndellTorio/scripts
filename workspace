@@ -14,9 +14,11 @@ if tmux has-session -t '=CODE'; then
 	exit 0
 fi
 
-tmux new-session -d -s CODE -n Terminal -c /mnt/c/Users/GAIA/Documents/Project
+tmux new-session -d -s CODE -n Fun -c /mnt/c/Users/GAIA/Documents/Project
 
+tmux new-window -n Terminal -c /mnt/c/Users/GAIA/Documents/Project
 tmux new-window -n Arduino -c /mnt/c/Users/GAIA/Documents/Project
 tmux send-keys -t "=CODE:=Arduino" "tmux split-window -v -c /mnt/c/Users/GAIA/Documents/Project && tmux resize-pane -D 12 && tmux select-pane -U && clear && fortune | cowsay -f ghostbusters" Enter
+tmux send-keys -t "=CODE:=Fun" "watch -n 10 happyghost" Enter
 
 att
