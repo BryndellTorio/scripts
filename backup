@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+# ref: https://ubuntu.com/server/docs/backups-shell-scripts
+# This script will backup folder $dest every 1 hour then delete all files
+# which is more than one week.
+
+backup_files="/var/www/egs_html"
+
+dest="/web_backUp"
+
+day=$(date +%H:%M:%S-%A)
+hostname=$(hostname -s)
+archive_file="$hostname-$day.tgz"
+
+echo "Initializing back up file for $backup_files to $dest/$archive_file"
+date
+
+tar czf $dest/$archive_file $backup_files > /dev/null 2>&1
+
+echo
+echo "Done."
+date
+
+ls -lh $dest
+
+find /web_backUp -type f -mmin +10080 -delete;
