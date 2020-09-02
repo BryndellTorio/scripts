@@ -1,0 +1,5 @@
+cause of bug: changing the timezone of the system from +0 to Asia/Dubai +04
+
+Solution:
+Bug fixed by service cron restart.
+
