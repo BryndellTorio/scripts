@@ -3,3 +3,15 @@ cause of bug: changing the timezone of the system from +0 to Asia/Dubai +04
 Solution:
 Bug fixed by service cron restart.
 
+How did the answer come to me? when I am on a relax state right after I become
+desperate for an answer. I know deep inside that there is problem in the cron timing
+because I noticed from [ */1 * * * * ] that the script is running but on a specific time
+it is not.
+
+What I learn from this debugging experience?
+	- List down all the know facts
+	- List all the anomalies like "when set to every minute the script is 
+	  running while on a specific time it is not." In there I am able to
+	  come up with a hypothesis.
+	- Work on the hypothesis until you come up with a conclusive answer
+	  before jumping into another hypothesis.
