@@ -22,4 +22,4 @@ date
 
 ls -lh $dest
 
-find /web_backUp -type f -mmin +10080 -delete;
+find /web_backUp -type f -mmin +1440 -delete;
