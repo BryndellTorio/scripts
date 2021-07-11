@@ -67,30 +67,10 @@ if (Test-Path($ChocolateyProfile)) {
   Import-Module "$ChocolateyProfile"
 }
 
-#Import-Module 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
-
 <# Load SSH agent utils
  Reference: https://dillieodigital.wordpress.com/2015/10/20/how-to-git-and-ssh-in-powershell/
             https://vladtalkstech.com/2014/03/change-powershell-machinepolicy-execution-policy-windows-server-2012r2.html           
             https://www.youtube.com/watch?v=n2-wZDux8L4
 #>
 
-$env:path += ";" + (Get-Item "Env:ProgramFiles").Value + "\Git\bin"
-$env:path += ";" + (Get-Item "Env:ProgramFiles").Value + "\Git\usr\bin"
-
-. (Resolve-Path ~/Documents/WindowsPowershell/ssh-agent-utils.ps1)
-
-# Spoof terminal environment for git color.
-$env:TERM = 'cygwin'
-
-# Load posh-git example profile, which will setup a prompt
-. 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\profile.example.ps1'
-
-Pop-Location
-
-Add-SshKey
-
-Start-SshAgent -Quiet
-
-Import-Module 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
-Start-SshAgent -Quiet
+. 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\install.ps1'
