@@ -1,5 +1,5 @@
 
-Import-Module 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
+# Import-Module 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
 
 # First system config for windows 10.
 function toff { shutdown /p }
@@ -10,10 +10,28 @@ function openPsAdmin {
   Start-Process -Filepath "powershell" -Verb runas -WindowStyle Maximized 
   }
 Set-Alias -name admin -value openPsAdmin
-function cdMovies {
-  Set-Location C:\Movies
+
+function Set-Directory {
+
+  [CmdletBinding(SupportsShouldProcess)]
+
+  param (
+    [string]$Location
+  )
+  
+  process {
+    if ($Location -eq "prjdir") {
+        Set-Location "C:\Users\Bryndell.Torio\OneDrive - Integrated Micro-Electronics Inc\Design\Projects"
+    } elseif ($Location -eq "datasheet") {
+        Set-Location "C:\Users\Bryndell.Torio\OneDrive - Integrated Micro-Electronics Inc\Datasheet"
+    } elseif ($location -eq "profile") {
+        set-location "~\documents\windowspowershell"
+    } else {
+        Write-Output "$Location not found."
+    }
   }
-Set-Alias -name movies -value cdMovies
+}
+Set-Alias -Name "go" -Value "Set-Directory"
 
 function Open-Application {
 
@@ -28,15 +46,15 @@ function Open-Application {
     } elseif ($Name -eq "qbit") {
       Start-Process 'C:\Program Files\qBittorrent\qbittorrent.exe'
     } elseif ($Name -eq "setal") {
-      Start-Process 'C:\Users\GAIA\Documents\PowerShell\Microsoft.PowerShell_profile'
+      Start-Process '~\Documents\WindowsPowerShell\Microsoft.PowerShell_profile'
     } elseif ($Name -eq "prj1") {
-      Start-Process 'C:\Users\GAIA\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Cadence Release 17.2-2016\OrCAD Products\Capture CIS' 'C:\Users\GAIA\Desktop\Design\Projects\DSSTI02_Control\DSSTI02_CONTROL.opj'
+      Start-Process '~\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Cadence Release 17.2-2016\OrCAD Products\Capture CIS' '~\Desktop\Design\Projects\DSSTI02_Control\DSSTI02_CONTROL.opj'
     } elseif ($Name -eq "prj2") {
-      Start-Process 'C:\Users\GAIA\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Cadence Release 17.2-2016\OrCAD Products\Capture CIS' 'C:\Users\GAIA\Desktop\Design\Projects\DSSTI02_Sentinel\DSSTI02_SENTINEL.opj'
+      Start-Process '~\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Cadence Release 17.2-2016\OrCAD Products\Capture CIS' '~\Desktop\Design\Projects\DSSTI02_Sentinel\DSSTI02_SENTINEL.opj'
     } elseif ($Name -eq "snptl") {
       Start-Process "snippingtool"
     } elseif ($Name -eq "bom") {
-      Start-Process 'C:\Users\GAIA\Desktop\Design\Cadence Configuration reference\BOM processing tool.xlsm'
+      Start-Process '~\Desktop\Design\Cadence Configuration reference\BOM processing tool.xlsm'
     } elseif ($Name -eq "word") {
       Start-Process 'C:\Program Files (x86)\Microsoft Office\root\Office16\winword.exe' -WindowStyle Maximized
       Clear-Host
@@ -50,11 +68,11 @@ function Open-Application {
       Clear-Host
       Write-Host "[executing Microsoft PowerPoint]" -ForegroundColor Green
     } elseif ($Name -eq "datasheet") {
-      Start-Process 'C:\Users\GAIA\OneDrive - Integrated Micro-Electronics Inc\Datasheet'
+      Start-Process '~\OneDrive - Integrated Micro-Electronics Inc\Datasheet'
     } elseif ($Name -eq "prjdir") {
-      Start-Process 'C:\Users\GAIA\Desktop\Design\Projects'
+      Start-Process '~\Desktop\Design\Projects'
     } elseif ($Name -eq "ref") {
-      Start-Process 'C:\Users\GAIA\Desktop\Design\Projects\reference'
+      Start-Process '~\Desktop\Design\Projects\reference'
     } else {
       Write-Host "[$Name not found.]" -ForegroundColor Red
     }
@@ -71,7 +89,7 @@ function Close-Application {
 
   process {
     $_openQbit = Get-Process -Name "qbittorrent" -ErrorAction SilentlyContinue
-    $_setAlias = Get-Process -Name "Code - Insiders" -ErrorAction SilentlyContinue
+    $_code = Get-Process -Name "Code" -ErrorAction SilentlyContinue
     $_open_Edge = Get-Process -Name "Msedge" -ErrorAction SilentlyContinue
     $_openWinWord = Get-Process -Name "WINWORD" -ErrorAction SilentlyContinue
     $_openExcel = Get-Process -Name "EXCEL" -ErrorAction SilentlyContinue
@@ -87,12 +105,13 @@ function Close-Application {
     $_staDatasheet2 = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
     $_staMovies = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
     $_staMsTeams = Get-Process -Name "teams" -ErrorAction SilentlyContinue
+    $_outlook = Get-Process -Name "OUTLOOK" -ErrorAction SilentlyContinue
     Write-Host "[closing $ApplicationName]" -ForegroundColor Red
 
     if (($_openQbit.HasExited -eq $false) -and ($ApplicationName -eq "qbit")) {
       Stop-Process -Name "qbittorrent"
-    } elseif (($_setAlias.HasExited -eq $false) -and ($ApplicationName -eq "code")) {
-      Stop-Process -Name "Code - Insiders"
+    } elseif (($_code.HasExited -eq $false) -and ($ApplicationName -eq "code")) {
+      Stop-Process -Name "Code"
     } elseif (($_open_Edge.HasExited -eq $false) -and ($ApplicationName -eq "edge")) {
       Stop-Process -InputObject $_open_Edge
     } elseif (($_openWinWord.HasExited -eq $false) -and ($ApplicationName -eq "word")) {
@@ -109,9 +128,11 @@ function Close-Application {
       Stop-Process -Name "explorer"
     } elseif (($_staMsTeams.HasExited -eq $false) -and ($ApplicationName -eq "teams")) {
       Stop-Process -InputObject $_staMsTeams
+    } elseif (($_outlook.HasExited -eq $false) -and ($ApplicationName -eq "OUTLOOK")) {
+      Stop-Process -Name "OUTLOOK"
     } elseif ($ApplicationName -eq "all") {
       Stop-Process -Name "Capture" -ErrorAction SilentlyContinue
-      Stop-Process -Name "Code - Insiders" -ErrorAction SilentlyContinue
+      Stop-Process -Name "Code" -ErrorAction SilentlyContinue
       Stop-Process -Name "qbittorrent" -ErrorAction SilentlyContinue
       Stop-Process -Name "winword" -ErrorAction SilentlyContinue
       Stop-Process -Name "EXCEL" -ErrorAction SilentlyContinue
@@ -120,8 +141,10 @@ function Close-Application {
       Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
       Stop-Process -Name "explorer" -ErrorAction SilentlyContinue
       Stop-Process -Name "Teams" -ErrorAction SilentlyContinue
+      Stop-Process -Name "Microsoft.Photos" -ErrorAction SilentlyContinue
+      Stop-Process -Name "OUTLOOK" -ErrorAction SilentlyContinue
     } else {
-      Write-Output "Application not found."
+      Write-Host "[Application not found.]" -ForegroundColor Red
     }
   }
 }
@@ -143,4 +166,4 @@ if (Test-Path($ChocolateyProfile)) {
             https://www.youtube.com/watch?v=n2-wZDux8L4
 #>
 
-. 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\install.ps1'
+# . 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\install.ps1'
