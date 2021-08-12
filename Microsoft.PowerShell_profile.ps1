@@ -17,10 +17,28 @@ function openPsAdmin {
   Start-Process -Filepath "powershell" -Verb runas -WindowStyle Maximized 
   }
 Set-Alias -name admin -value openPsAdmin
-function cdMovies {
-  Set-Location C:\Movies
+
+function Set-Directory {
+
+  [CmdletBinding(SupportsShouldProcess)]
+
+  param (
+    [string]$Location
+  )
+  
+  process {
+    if ($Location -eq "prjdir") {
+        Set-Location "C:\Users\Bryndell.Torio\OneDrive - Integrated Micro-Electronics Inc\Design\Projects"
+    } elseif ($Location -eq "datasheet") {
+        Set-Location "C:\Users\Bryndell.Torio\OneDrive - Integrated Micro-Electronics Inc\Datasheet"
+    } elseif ($location -eq "profile") {
+        set-location "~\documents\windowspowershell"
+    } else {
+        Write-Output "$Location not found."
+    }
   }
-Set-Alias -name movies -value cdMovies
+}
+Set-Alias -Name "go" -Value "Set-Directory"
 
 function buildprj_Folder_Heirarchy {
   [CmdletBinding(SupportsShouldProcess)]
@@ -110,7 +128,7 @@ function Close-Application {
 
   process {
     $_openQbit = Get-Process -Name "qbittorrent" -ErrorAction SilentlyContinue
-    $_setAlias = Get-Process -Name "Code - Insiders" -ErrorAction SilentlyContinue
+    $_code = Get-Process -Name "Code" -ErrorAction SilentlyContinue
     $_open_Edge = Get-Process -Name "Msedge" -ErrorAction SilentlyContinue
     $_openWinWord = Get-Process -Name "WINWORD" -ErrorAction SilentlyContinue
     $_openExcel = Get-Process -Name "EXCEL" -ErrorAction SilentlyContinue
@@ -126,6 +144,7 @@ function Close-Application {
     $_staDatasheet2 = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
     $_staMovies = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
     $_staMsTeams = Get-Process -Name "teams" -ErrorAction SilentlyContinue
+    $_outlook = Get-Process -Name "OUTLOOK" -ErrorAction SilentlyContinue
     Write-Host "[closing $Name]" -ForegroundColor Red
 
     if (($_openQbit.HasExited -eq $false) -and ($Name -eq "qbit")) {
@@ -148,9 +167,11 @@ function Close-Application {
       Stop-Process -Name "explorer"
     } elseif (($_staMsTeams.HasExited -eq $false) -and ($Name -eq "teams")) {
       Stop-Process -InputObject $_staMsTeams
-    } elseif ($Name -eq "all") {
+    } elseif (($_outlook.HasExited -eq $false) -and ($Name -eq "OUTLOOK")) {
+      Stop-Process -Name "OUTLOOK"
+    } elseif ($ApplicationName -eq "all") {
       Stop-Process -Name "Capture" -ErrorAction SilentlyContinue
-      Stop-Process -Name "Code - Insiders" -ErrorAction SilentlyContinue
+      Stop-Process -Name "Code" -ErrorAction SilentlyContinue
       Stop-Process -Name "qbittorrent" -ErrorAction SilentlyContinue
       Stop-Process -Name "winword" -ErrorAction SilentlyContinue
       Stop-Process -Name "EXCEL" -ErrorAction SilentlyContinue
@@ -159,8 +180,10 @@ function Close-Application {
       Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
       Stop-Process -Name "explorer" -ErrorAction SilentlyContinue
       Stop-Process -Name "Teams" -ErrorAction SilentlyContinue
+      Stop-Process -Name "Microsoft.Photos" -ErrorAction SilentlyContinue
+      Stop-Process -Name "OUTLOOK" -ErrorAction SilentlyContinue
     } else {
-      Write-Output "Application not found."
+      Write-Host "[Application not found.]" -ForegroundColor Red
     }
   }
 }
@@ -182,4 +205,3 @@ if (Test-Path($ChocolateyProfile)) {
             https://www.youtube.com/watch?v=n2-wZDux8L4
 #>
 
-#. 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\install.ps1'
