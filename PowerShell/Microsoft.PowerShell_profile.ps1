@@ -3,7 +3,7 @@ Add-PoshGitToProfile
 
 #variable defined for quick folder switch.
 $prjDir = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\"
-$prof = "$HOME\Documents\PowerShell\"
+$prof = "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 $dirPrj1 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Control\DSSTI02_CONTROL.opj"
 $dirPrj2 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Sentinel\DSSTI02_Sentinel.opj"
 $dirPrj3 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSACM01\Schematic\DSACM01.opj"
@@ -21,23 +21,58 @@ function cdMovies {
   }
 Set-Alias -name movies -value cdMovies
 
-function Project_Folder_Heirarchy {
+function Build-File {
   [CmdletBinding(SupportsShouldProcess)]
   param (
     [string]$Name
   )
-  if ( Test-Path -Path ".\$Name") {
-    Write-Warning "$Name already exist."
-  } else {
-    New-item -Name $Name -Path . -ItemType Directory -ErrorAction Ignore
-    "Docs", "Datasheet", "Schematic" | ForEach-Object {New-item -Name "$_" -Path ".\$Name" -ItemType "Directory" -ErrorAction "Ignore"}
-    "BackUp", "Version" | ForEach-Object {New-Item -Name "$_" -Path ".\$Name\Schematic" -ItemType "Directory" -ErrorAction "Ignore"}
-    "Report", "Upload", "Reference" | ForEach-Object {New-Item -Name "$_" -Path ".\$Name\Docs" -ItemType "Directory" -ErrorAction "Ignore"}
-    New-Item -Name "$Name Schematic" -Path .\$Name\Docs\Upload -ItemType "Directory" -ErrorAction "Ignore"
-    Write-Output "`n[$Name project sub-folders generated.]"
+
+  process {
+    if ($Name -eq "upload") {
+      if ((Test-Path .\..\Docs) -and (Test-Path .\..\Docs\Upload) -and (Test-Path .\..\Datasheet) -and (Test-Path .\..\Schematic) -and (Test-Path .\*.dsn) -and (Test-Path .\*bom.xlsx)) {
+        $_tmp = Get-ChildItem *.DSN
+        $_splitTmp = $_tmp -split '\\'
+        $_folderName = $_splitTmp[$_splitTmp.Length - 1] -split '\.'
+        $_folderName = $_folderName[0]
+        if ((Test-Path ".\..\Docs\Upload\$_folderName Schematic.zip") -and (Test-Path ".\..\Docs\Upload\$_folderName BOM.xlsx")) {
+          Move-Item -Path ".\..\Docs\Upload\$_folderName Schematic.zip" -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).zip"
+          Move-Item -Path ".\..\Docs\Upload\$_folderName BOM.xlsx" -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).xlsx"
+        }
+        Copy-Item *.xlsx -Destination "..\Docs\Upload\"
+        Get-ChildItem *.opj, *.dsn, *.bom, *.net, *.olb, *.drc | Compress-Archive -DestinationPath "..\Docs\Upload\$_folderName Schematic" -Force
+      }
+      else {
+        Write-Warning "Not standard folder structure. Use 'Build-Project' cmdlet instead or Check if schematic files are complete."
+      }
+    }
   }
 }
-Set-Alias -Name Build-Project -Value Project_Folder_Heirarchy
+
+function Build-Project {
+   [CmdletBinding(SupportsShouldProcess)]
+  param (
+    [string]$Name
+  ) 
+  
+  process {
+    $_tmp = Get-Location
+    $_tmp = $_tmp -split '\\'
+    if (($_tmp[$_tmp.Length - 1] -eq "Project") -or ($_tmp[$_tmp.Length - 1] -eq "Projects") -or ($_tmp[$_tmp.Length - 1] -eq "tmp")) {
+      if (Test-Path -Path ".\*$Name*") {
+        Write-Warning "$Name already exist."
+      }
+      else {
+        New-item -Name $Name -Path . -ItemType Directory -ErrorAction Ignore
+        "Docs", "Datasheet", "Schematic" | ForEach-Object { New-item -Name "$_" -Path ".\$Name" -ItemType "Directory" -ErrorAction "Ignore" }
+        "BackUp", "Version", "Report", "Upload", "Reference" | ForEach-Object { New-Item -Name "$_" -Path ".\$Name\Docs" -ItemType "Directory" -ErrorAction "Ignore" }
+        New-Item -Name "$Name Schematic" -Path .\$Name\Docs\Upload -ItemType "Directory" -ErrorAction "Ignore"
+        Write-Output "`n[$Name project sub-folders generated.]"
+      }
+    } else {
+      Write-Warning "Check project location."
+    }
+  }
+}
 
 function Open-Application {
 
@@ -52,7 +87,7 @@ function Open-Application {
     } elseif ($Name -eq "qbit") {
       Start-Process 'C:\Program Files\qBittorrent\qbittorrent.exe'
     } elseif ($Name -eq "prof") {
-      Start-Process $prof
+      Start-Process -FilePath "$HOME\AppData\Local\Programs\Microsoft VS Code Insiders\bin\code-insiders" $prof
     } elseif ($Name -eq "prj1") {
       Start-Process $dirPrj1
     } elseif ($Name -eq "prj2") {
@@ -148,7 +183,7 @@ function Close-Application {
       Stop-Process -Name "explorer"
     } elseif (($_staMsTeams.HasExited -eq $false) -and ($Name -eq "teams")) {
       Stop-Process -InputObject $_staMsTeams
-    } elseif (($_staMsTeams.HasExited -eq $false) -and ($Name -eq "outlook")) {
+    } elseif (($_staOutlook.HasExited -eq $false) -and ($Name -eq "outlook")) {
       Stop-Process -InputObject $_staOutlook
     } elseif ($Name -eq "all") {
       Stop-Process -Name "Capture" -ErrorAction SilentlyContinue
@@ -162,12 +197,30 @@ function Close-Application {
       Stop-Process -Name "explorer" -ErrorAction SilentlyContinue
       Stop-Process -Name "Teams" -ErrorAction SilentlyContinue
       Stop-Process -Name "outlook" -ErrorAction SilentlyContinue
+      Stop-Process -Name "EdrawMax" -ErrorAction SilentlyContinue
+      Stop-Process -Name "Move Mouse" -ErrorAction SilentlyContinue
     } else {
       Write-Output "Application not found."
     }
   }
 }
 Set-Alias -Name close -value Close-Application
+
+function Ohayou {
+  [CmdletBinding(SupportsShouldProcess)]
+  param (
+    
+  )
+  
+  process {
+    "http://192.168.63.9/elog/", "https://webportal.global-imi.com/CommonLogin/Login?sysid=pNm0fj7kDN%252FwtNs4mWRs7A%253D%253D", "https://webportal.global-imi.com/CommonLogin/Login?sysid=eWbbLBrMaUoYEjbv2Xy1wg%253D%253D", "https://bryndelltorio.kanbantool.com/b/751627#?", "http://phlagspfe1/TeamSites/DND/ph/SitePages/DD%20Process%20Revision%202017.aspx", "https://octopart.com/" | ForEach-Object { Start-Process microsoft-edge:$_ }
+    Start-Process "C:\Program Files (x86)\Microsoft Office\root\Office16\OUTLOOK.EXE" -WindowStyle Maximized
+    $_ohayouTmp = $HOME -split '\\'
+    $_ohayouTmp = $_ohayouTmp[$_ohayouTmp.Length -1]
+    Write-Output "Good morning $_ohayouTmp!"
+    Remove-Variable _ohayouTmp
+  }
+}
 
 # This command will restart the wsl.
 # Get-Service LxssManager | Restart-Service
