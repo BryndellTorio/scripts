@@ -4,8 +4,8 @@ Add-PoshGitToProfile
 #variable defined for quick folder switch.
 $prjDir = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\"
 $prof = "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
-$dirPrj1 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Control\DSSTI02_CONTROL.opj"
-$dirPrj2 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Sentinel\DSSTI02_Sentinel.opj"
+$dirPrj1 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Control\Schematic\DSSTI02_CONTROL.opj"
+$dirPrj2 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Sentinel\Schematic\DSSTI02_Sentinel.opj"
 $dirPrj3 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSACM01\Schematic\DSACM01.opj"
 # First system config for windows 10.
 function toff { shutdown /p }
@@ -29,14 +29,16 @@ function Build-File {
 
   process {
     if ($Name -eq "upload") {
-      if ((Test-Path .\..\Docs) -and (Test-Path .\..\Docs\Upload) -and (Test-Path .\..\Datasheet) -and (Test-Path .\..\Schematic) -and (Test-Path .\*.dsn) -and (Test-Path .\*bom.xlsx)) {
+      if ((Test-Path .\..\Docs) -and (Test-Path .\..\Docs\Upload) -and (Test-Path .\..\Datasheet) -and (Test-Path .\..\Schematic) -and (Test-Path .\*.dsn) -and (Test-Path .\*.xlsx)) {
         $_tmp = Get-ChildItem *.DSN
         $_splitTmp = $_tmp -split '\\'
         $_folderName = $_splitTmp[$_splitTmp.Length - 1] -split '\.'
         $_folderName = $_folderName[0]
-        if ((Test-Path ".\..\Docs\Upload\$_folderName Schematic.zip") -and (Test-Path ".\..\Docs\Upload\$_folderName BOM.xlsx")) {
-          Move-Item -Path ".\..\Docs\Upload\$_folderName Schematic.zip" -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).zip"
-          Move-Item -Path ".\..\Docs\Upload\$_folderName BOM.xlsx" -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).xlsx"
+        if ((Test-Path ".\..\Docs\Upload\*.xlsx") -and (Test-Path ".\..\Docs\Upload\*.zip")) {
+          [string]$_tmpBOM = Get-ChildItem .\..\Docs\Upload\*.xlsx
+          [string]$_tmpZip = Get-ChildItem .\..\Docs\Upload\*.zip
+          Move-Item -Path $_tmpZip -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).zip"
+          Move-Item -Path $_tmpBOM -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).xlsx"
         }
         Copy-Item *.xlsx -Destination "..\Docs\Upload\"
         Get-ChildItem *.opj, *.dsn, *.bom, *.net, *.olb, *.drc | Compress-Archive -DestinationPath "..\Docs\Upload\$_folderName Schematic" -Force
@@ -65,7 +67,6 @@ function Build-Project {
         New-item -Name $Name -Path . -ItemType Directory -ErrorAction Ignore
         "Docs", "Datasheet", "Schematic" | ForEach-Object { New-item -Name "$_" -Path ".\$Name" -ItemType "Directory" -ErrorAction "Ignore" }
         "BackUp", "Version", "Report", "Upload", "Reference" | ForEach-Object { New-Item -Name "$_" -Path ".\$Name\Docs" -ItemType "Directory" -ErrorAction "Ignore" }
-        New-Item -Name "$Name Schematic" -Path .\$Name\Docs\Upload -ItemType "Directory" -ErrorAction "Ignore"
         Write-Output "`n[$Name project sub-folders generated.]"
       }
     } else {
