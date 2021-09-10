@@ -2,11 +2,11 @@
 Add-PoshGitToProfile
 
 #variable defined for quick folder switch.
-$prjDir = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\"
-$prof = "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
-$dirPrj1 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Control\Schematic\DSSTI02_CONTROL.opj"
-$dirPrj2 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Sentinel\Schematic\DSSTI02_Sentinel.opj"
-$dirPrj3 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSACM01\Schematic\DSACM01.opj"
+[string]$prjDir = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\"
+[string]$prof = "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
+[string]$dirPrj1 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Control\Schematic\DSSTI02_CONTROL.opj"
+[string]$dirPrj2 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Sentinel\Schematic\DSSTI02_Sentinel.opj"
+[string]$dirPrj3 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSACM01\Schematic\DSACM01.opj"
 # First system config for windows 10.
 function toff { shutdown /p }
 Set-Alias shortcut 'toff'
@@ -41,7 +41,9 @@ function Build-File {
           Move-Item -Path $_tmpBOM -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).xlsx"
         }
         Copy-Item *.xlsx -Destination "..\Docs\Upload\"
-        Get-ChildItem *.opj, *.dsn, *.bom, *.net, *.olb, *.drc | Compress-Archive -DestinationPath "..\Docs\Upload\$_folderName Schematic" -Force
+        Get-ChildItem *.opj, *.dsn, *.bom, *.net, *.olb, *.drc, *.pdf | Compress-Archive -DestinationPath "..\Docs\Upload\$_folderName Schematic" -Force
+        Start-Process ..\Docs\Upload -Confirm
+        Clear-Host
       }
       else {
         Write-Warning "Not standard folder structure. Use 'Build-Project' cmdlet instead or Check if schematic files are complete."
@@ -65,7 +67,8 @@ function Build-Project {
       }
       else {
         New-item -Name $Name -Path . -ItemType Directory -ErrorAction Ignore
-        "Docs", "Datasheet", "Schematic" | ForEach-Object { New-item -Name "$_" -Path ".\$Name" -ItemType "Directory" -ErrorAction "Ignore" }
+        "Docs", "Datasheet", "PCB", "Schematic" | ForEach-Object { New-item -Name "$_" -Path ".\$Name" -ItemType "Directory" -ErrorAction "Ignore" }
+        "Footprint", "Pad" | ForEach-Object { New-item -Name "$_" -Path ".\$Name\PCB" -ItemType "Directory" -ErrorAction "Ignore" }
         "BackUp", "Version", "Report", "Upload", "Reference" | ForEach-Object { New-Item -Name "$_" -Path ".\$Name\Docs" -ItemType "Directory" -ErrorAction "Ignore" }
         Write-Output "`n[$Name project sub-folders generated.]"
       }
@@ -103,12 +106,16 @@ function Open-Application {
       Start-Process "C:\Cadence\SPB_17.2\tools\bin\capture.exe"
     } elseif ($Name -eq "pad") {
       Start-Process "C:\Cadence\SPB_17.2\tools\bin\padstack_editor.exe"
+    } elseif ($Name -eq "lp") {
+      Start-Process "C:\Users\GAIA\OneDrive - Integrated Micro-Electronics Inc\Design\Software\LP Calculator V2010\LP_Calculator.exe"
     } elseif ($Name -eq "bom") {
       Start-Process 'C:\Users\GAIA\Documents\Design\Cadence Configuration reference\BOM processing tool.xlsm'
     } elseif ($Name -eq "word") {
       Start-Process 'C:\Program Files (x86)\Microsoft Office\root\Office16\winword.exe' -WindowStyle Maximized
       Clear-Host
       Write-Output "[executing Microsoft Word]" 
+    } elseif ($Name -eq "teams") {
+      Start-Process ms-teams:
     } elseif ($Name -eq "excel") {
       Start-Process 'C:\Program Files (x86)\Microsoft Office\root\Office16\excel.exe' -WindowStyle Maximized
       Clear-Host
@@ -129,6 +136,10 @@ function Open-Application {
       Start-Process $prjDir
     } elseif ($Name -eq "ref") {
       Start-Process 'C:\Users\GAIA\Documents\Design\Projects\reference'
+    } elseif ($Name -eq "github") {
+      Start-Process microsoft-edge:https://github.com/BryndellTorio
+    } elseif ($Name -eq "edraw") {
+      Start-Proces "C:\Program Files (x86)\Edrawsoft\EdrawMax\EdrawMax.exe"
     } else {
       Write-Warning "[$Name not found.]" 
     }
@@ -144,62 +155,37 @@ function Close-Application {
   )
 
   process {
-    $_openQbit = Get-Process -Name "qbittorrent" -ErrorAction SilentlyContinue
-    $_setAlias = Get-Process -Name "Code - Insiders" -ErrorAction SilentlyContinue
-    $_open_Edge = Get-Process -Name "Msedge" -ErrorAction SilentlyContinue
-    $_openWinWord = Get-Process -Name "WINWORD" -ErrorAction SilentlyContinue
-    $_openExcel = Get-Process -Name "EXCEL" -ErrorAction SilentlyContinue
-    $_openPowerPnt = Get-Process -Name "POWERPNT" -ErrorAction SilentlyContinue
-    $_staPrj1 = Get-Process -Name "Capture" -ErrorAction SilentlyContinue
-    $_staPrj2 = Get-Process -Name "Capture" -ErrorAction SilentlyContinue
-    $_sniptool = Get-Process -Name "SnippingTool" -ErrorAction SilentlyContinue
-    $_staBomTool = Get-Process -Name "EXCEL" -ErrorAction SilentlyContinue
-    $_staReference = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
-    $_prjdirectory = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
-    $_staDatasheet = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
-    $_staDatasheet1 = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
-    $_staDatasheet2 = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
-    $_staMovies = Get-Process -Name "explorer" -ErrorAction SilentlyContinue
-    $_staMsTeams = Get-Process -Name "teams" -ErrorAction SilentlyContinue
-    $_staOutlook = Get-Process -Name "outlook" -ErrorAction SilentlyContinue
     Write-Output "[closing $Name]" 
 
-    if (($_openQbit.HasExited -eq $false) -and ($Name -eq "qbit")) {
+    if ($Name -eq "qbit") {
       Stop-Process -Name "qbittorrent"
-    } elseif (($_setAlias.HasExited -eq $false) -and ($Name -eq "code")) {
+    } elseif ($Name.ToLower() -eq "code") {
       Stop-Process -Name "Code - Insiders"
-    } elseif (($_open_Edge.HasExited -eq $false) -and ($Name -eq "edge")) {
-      Stop-Process -InputObject $_open_Edge
-    } elseif (($_openWinWord.HasExited -eq $false) -and ($Name -eq "word")) {
-      Stop-Process -InputObject $_openWinWord
-    } elseif (($_sniptool.HasExited -eq $false) -and ($Name -eq "edge")) {
+    } elseif ($Name.ToLower() -eq "edge") {
+      Stop-Process -Name "edge"
+    } elseif ($Name.ToLower() -eq "word") {
+      Stop-Process -Name "WINWORD"
+    } elseif ($Name.ToLower() -eq "edge") {
       Stop-Process -Name "snippingtool"
-    } elseif ((($_openExcel.HasExited -eq $false) -or ($_staBomTool.HasExited -eq $false)) -and ($Name -eq "excel")) {
+    } elseif ($Name.ToLower() -eq "excel") {
       Stop-Process -Name "EXCEL"
-    } elseif (($_openPowerPnt.HasExited -eq $false) -and ($Name -eq "powerpnt")) {
-      Stop-Process -InputObject $_openPowerPnt
-    } elseif ((($_staPrj1.HasExited -eq $false) -or ($_staPrj2.HasExited -eq $false)) -and ($Name -eq "Capture")) {
+    } elseif ($Name.ToLower() -eq "powerpnt") {
+      Stop-Process -Name "Powerpnt"
+    } elseif ($Name.ToLower() -eq "Capture") {
       Stop-Process -Name "Capture"
-    } elseif ((($_staReference.HasExited -eq $false) -or ($_staDatasheet.HasExited -eq $false) -or ($_staDatasheet1.HasExited -eq $false) -or ($_staDatasheet2.HasExited -eq $false) -or ($_staMovies.HasExited -eq $false) -or ($_prjdirectory.HasExited -eq $false)) -and ($Name -eq "explorer")) {
+    } elseif ($Name.ToLower() -eq "explorer") {
       Stop-Process -Name "explorer"
-    } elseif (($_staMsTeams.HasExited -eq $false) -and ($Name -eq "teams")) {
-      Stop-Process -InputObject $_staMsTeams
-    } elseif (($_staOutlook.HasExited -eq $false) -and ($Name -eq "outlook")) {
-      Stop-Process -InputObject $_staOutlook
-    } elseif ($Name -eq "all") {
-      Stop-Process -Name "Capture" -ErrorAction SilentlyContinue
-      Stop-Process -Name "Code - Insiders" -ErrorAction SilentlyContinue
-      Stop-Process -Name "qbittorrent" -ErrorAction SilentlyContinue
-      Stop-Process -Name "winword" -ErrorAction SilentlyContinue
-      Stop-Process -Name "EXCEL" -ErrorAction SilentlyContinue
-      Stop-Process -Name "powerpnt" -ErrorAction SilentlyContinue
-      Stop-Process -Name "snippingtool" -ErrorAction SilentlyContinue
-      Stop-Process -Name "msedge" -ErrorAction SilentlyContinue
-      Stop-Process -Name "explorer" -ErrorAction SilentlyContinue
-      Stop-Process -Name "Teams" -ErrorAction SilentlyContinue
-      Stop-Process -Name "outlook" -ErrorAction SilentlyContinue
-      Stop-Process -Name "EdrawMax" -ErrorAction SilentlyContinue
-      Stop-Process -Name "Move Mouse" -ErrorAction SilentlyContinue
+    } elseif ($Name.ToLower() -eq "teams") {
+      Stop-Process -Name "teams"
+    } elseif ($Name.ToLower() -eq "outlook") {
+      Stop-Process -Name "Outlook"
+    } elseif ($Name.ToLower() -eq "lp") {
+      Stop-Process -Name "LP_Calculator"
+    } elseif ($Name.ToLower() -eq "all") {
+    "POWERPNT", "EXCEL", "WINWORD", "Msedge", "Code - Insiders", "qbittorrent", 
+    "SnippingTool", "teams", "explorer", "Capture", "LP_Calculator", "outlook",
+    "Move Mouse", "FoxitPDFReader"
+    | ForEach-Object { Stop-Process -Name "$_" -ErrorAction Ignore }
     } else {
       Write-Output "Application not found."
     }
