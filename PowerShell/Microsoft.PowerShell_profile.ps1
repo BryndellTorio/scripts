@@ -4,9 +4,9 @@ Add-PoshGitToProfile
 #variable defined for quick folder switch.
 [string]$prjDir = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\"
 [string]$prof = "$HOME\Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
-[string]$dirPrj1 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Control\Schematic\DSSTI02_CONTROL.opj"
-[string]$dirPrj2 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Sentinel\Schematic\DSSTI02_Sentinel.opj"
-[string]$dirPrj3 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSACM01\Schematic\DSACM01.opj"
+[string]$dirPrj1 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Control\Schematic\*.opj"
+[string]$dirPrj2 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Sentinel\Schematic\*.opj"
+[string]$dirPrj3 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSACM01\Schematic\*.opj"
 # First system config for windows 10.
 function toff { shutdown /p }
 Set-Alias shortcut 'toff'
@@ -28,25 +28,64 @@ function Build-File {
   )
 
   process {
-    if ($Name -eq "upload") {
+    if ($Name.ToLower() -eq "desup") {
       if ((Test-Path .\..\Docs) -and (Test-Path .\..\Docs\Upload) -and (Test-Path .\..\Datasheet) -and (Test-Path .\..\Schematic) -and (Test-Path .\*.dsn) -and (Test-Path .\*.xlsx)) {
         $_tmp = Get-ChildItem *.DSN
         $_splitTmp = $_tmp -split '\\'
         $_folderName = $_splitTmp[$_splitTmp.Length - 1] -split '\.'
-        $_folderName = $_folderName[0]
-        if ((Test-Path ".\..\Docs\Upload\*.xlsx") -and (Test-Path ".\..\Docs\Upload\*.zip")) {
-          [string]$_tmpBOM = Get-ChildItem .\..\Docs\Upload\*.xlsx
-          [string]$_tmpZip = Get-ChildItem .\..\Docs\Upload\*.zip
-          Move-Item -Path $_tmpZip -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).zip"
-          Move-Item -Path $_tmpBOM -Destination ".\..\Docs\BackUp\$_folderName-$(get-date -f HHmmss-MMddyy).xlsx"
+        $_folderName = $_folderName[0]      #Takes the filename of the folder.
+        if ((Test-Path ".\..\Docs\Upload\Schematic\*.xlsx") -and (Test-Path ".\..\Docs\Upload\Schematic\*.zip")) {
+          Move-Item -Path ".\..\Docs\Upload\Schematic\*.xlsx" -Destination ".\..\Docs\BackUp\Schematic\$_folderName-$(get-date -f HHmmss-MMddyy).zip"
+          Move-Item -Path ".\..\Docs\Upload\Schematic\*.zip" -Destination ".\..\Docs\BackUp\Schematic\$_folderName-$(get-date -f HHmmss-MMddyy).xlsx"     #Move the previous version into a BackUp folder.
         }
-        Copy-Item *.xlsx -Destination "..\Docs\Upload\"
-        Get-ChildItem *.opj, *.dsn, *.bom, *.net, *.olb, *.drc, *.pdf | Compress-Archive -DestinationPath "..\Docs\Upload\$_folderName Schematic" -Force
-        Start-Process ..\Docs\Upload -Confirm
+        Copy-Item *.xlsx -Destination "..\Docs\Upload\Schematic\"
+        Get-ChildItem *.opj, *.dsn, *.bom, *.net, *.olb, *.drc, *.pdf | Compress-Archive -DestinationPath "..\Docs\Upload\Schematic\$_folderName Schematic"-Force #Copy the files into a zip folder then store to Upload folder.
+        Start-Process "..\Docs\Upload\Schematic\" -Confirm
         Clear-Host
       }
       else {
         Write-Warning "Not standard folder structure. Use 'Build-Project' cmdlet instead or Check if schematic files are complete."
+      }
+    } elseif ($Name.ToLower() -eq "repup") {
+      if ((Test-Path .\..\..\Projects) -and (Test-Path .\Docs) -and (Test-Path .\Docs) -and (Test-Path .\Docs)) {
+        if (Test-Path -Path ".\Docs\Report\*HW Technical Plan*") { 
+          [string]$_tmp1 = Get-ChildItem ".\Docs\Report\*HW Technical Plan*"
+          $_splitTmp1 = $_tmp1 -split '\\'
+          $_TechPlan = $_splitTmp1[$_splitTmp1.Length - 1] -split '\.'
+          $_TechPlan = $_TechPlan[0]      #Takes the filename of the folder.
+          Move-Item -Path ".\Docs\Upload\Report\*Technical Plan*" -Destination  ".\Docs\BackUp\Report\$_TechPlan - $(get-date -f HHmmss-MMddyy).docx"
+          Copy-Item -Path '.\Docs\Report\*Technical Plan*' -Destination ".\Docs\Upload\Report"
+        }
+        else {
+          Write-Warning "HW Technical Plan file not found." 
+        }
+        if (Test-Path -Path ".\Docs\Report\*Design Report*") { 
+          [string]$_tmp2 = Get-ChildItem ".\Docs\Report\*Design Report*"
+          $_splitTmp2 = $_tmp2 -split '\\'
+          $_DesRep = $_splitTmp2[$_splitTmp2.Length - 1] -split '\.'
+          $_DesRep = $_DesRep[0]      #Takes the filename of the folder.
+          Move-Item -Path ".\Docs\Upload\Report\*Design Report*" -Destination  ".\Docs\BackUp\Report\$_DesRep - $(get-date -f HHmmss-MMddyy).docx"
+          Copy-Item -Path '.\Docs\Report\*Design Report*' -Destination ".\Docs\Upload\Report"
+        }
+        else {
+          Write-Warning "Design report file not found."
+        }
+        if (Test-Path -Path ".\Docs\Report\*Power Calculations*") { 
+          [string]$_tmp3 = Get-ChildItem ".\Docs\Report\*Power Calculations*"
+          $_splitTmp3 = $_tmp3 -split '\\'
+          $_PowCal = $_splitTmp3[$_splitTmp3.Length - 1] -split '\.'
+          $_PowCal = $_PowCal[0]      #Takes the filename of the folder.
+          Move-Item -Path ".\Docs\Upload\Report\*Power Calculations*" -Destination  ".\Docs\BackUp\Report\$_PowCal - $(get-date -f HHmmss-MMddyy).xlsx"
+          Copy-Item -Path '.\Docs\Report\*Power Calculations*' -Destination ".\Docs\Upload\Report"
+        }
+        else {
+          Write-Warning "Power calculations file not found." 
+        }
+        Start-Process ".\Docs\Upload\Report\" -Confirm
+        Clear-Host
+      }
+      else {
+        Write-Warning "Not in proper project directory. Check current location."
       }
     }
   }
@@ -69,7 +108,8 @@ function Build-Project {
         New-item -Name $Name -Path . -ItemType Directory -ErrorAction Ignore
         "Docs", "Datasheet", "PCB", "Schematic" | ForEach-Object { New-item -Name "$_" -Path ".\$Name" -ItemType "Directory" -ErrorAction "Ignore" }
         "Footprint", "Pad" | ForEach-Object { New-item -Name "$_" -Path ".\$Name\PCB" -ItemType "Directory" -ErrorAction "Ignore" }
-        "BackUp", "Version", "Report", "Upload", "Reference" | ForEach-Object { New-Item -Name "$_" -Path ".\$Name\Docs" -ItemType "Directory" -ErrorAction "Ignore" }
+        "BackUp", "Version", "Report", "Upload", "Reference", "Pictures" | ForEach-Object { New-Item -Name "$_" -Path ".\$Name\Docs" -ItemType "Directory" -ErrorAction "Ignore" }
+        "Schematic", "Report" | ForEach-Object {  New-item -Name "$_" -Path ".\$Name\Docs\BackUp" -ItemType "Directory" -ErrorAction "Ignore"; New-item -Name "$_" -Path ".\$Name\Docs\Upload" -ItemType "Directory" -ErrorAction "Ignore"; }
         Write-Output "`n[$Name project sub-folders generated.]"
       }
     } else {
@@ -91,7 +131,7 @@ function Open-Application {
     } elseif ($Name -eq "qbit") {
       Start-Process 'C:\Program Files\qBittorrent\qbittorrent.exe'
     } elseif ($Name -eq "prof") {
-      Start-Process -FilePath "$HOME\AppData\Local\Programs\Microsoft VS Code Insiders\bin\code-insiders" $prof
+      Start-Process -FilePath "C:\Program Files\Microsoft VS Code\bin\code.cmd" $prof
     } elseif ($Name -eq "prj1") {
       Start-Process $dirPrj1
     } elseif ($Name -eq "prj2") {
@@ -107,28 +147,30 @@ function Open-Application {
     } elseif ($Name -eq "pad") {
       Start-Process "C:\Cadence\SPB_17.2\tools\bin\padstack_editor.exe"
     } elseif ($Name -eq "lp") {
-      Start-Process "C:\Users\GAIA\OneDrive - Integrated Micro-Electronics Inc\Design\Software\LP Calculator V2010\LP_Calculator.exe"
+      Start-Process "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Software\LP Calculator V2010\LP_Calculator.exe"
+    } elseif ($Name -eq "saturn") {
+      Start-Process "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Saturn PCB Toolkit\PCB Toolkit V8.01.lnk"
     } elseif ($Name -eq "bom") {
-      Start-Process 'C:\Users\GAIA\Documents\Design\Cadence Configuration reference\BOM processing tool.xlsm'
+      Start-Process "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Cadence Configuration reference\BOM processing tool.xlsm"
     } elseif ($Name -eq "word") {
-      Start-Process 'C:\Program Files (x86)\Microsoft Office\root\Office16\winword.exe' -WindowStyle Maximized
+      Start-Process '"C:\Program Files\Microsoft Office\root\Office16\WINWORD.EXE"' -WindowStyle Maximized
       Clear-Host
       Write-Output "[executing Microsoft Word]" 
     } elseif ($Name -eq "teams") {
       Start-Process ms-teams:
     } elseif ($Name -eq "excel") {
-      Start-Process 'C:\Program Files (x86)\Microsoft Office\root\Office16\excel.exe' -WindowStyle Maximized
+      Start-Process '"C:\Program Files\Microsoft Office\root\Office16\EXCEL.EXE"' -WindowStyle Maximized
       Clear-Host
       Write-Output "[executing Microsoft Excel]" 
     } elseif ($Name -eq "powerpnt") {
-      Start-Process 'C:\Program Files (x86)\Microsoft Office\root\Office16\powerpnt.exe' -WindowStyle Maximized
+      Start-Process '"C:\Program Files\Microsoft Office\root\Office16\POWERPNT.EXE"' -WindowStyle Maximized
       Clear-Host
       Write-Output "[executing Microsoft PowerPoint]" 
     } elseif ($Name -eq "outlook") {
-      Start-Process "C:\Program Files (x86)\Microsoft Office\root\Office16\OUTLOOK.EXE" -WindowStyle Maximized
+      Start-Process "C:\Program Files\Microsoft Office\root\Office16\OUTLOOK.EXE" -WindowStyle Maximized
       Clear-Host
       Write-Output "[executing Microsoft Outlook]" 
-    }elseif ($Name -eq "datasheet") {
+    } elseif ($Name -eq "datasheet") {
       Start-Process 'C:\Users\GAIA\OneDrive - Integrated Micro-Electronics Inc\Datasheet'
     } elseif ($Name -eq "review") {
       Start-Process 'C:\Users\GAIA\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\Review'
@@ -162,7 +204,7 @@ function Close-Application {
     } elseif ($Name.ToLower() -eq "code") {
       Stop-Process -Name "Code - Insiders"
     } elseif ($Name.ToLower() -eq "edge") {
-      Stop-Process -Name "edge"
+      Stop-Process -Name "msedge"
     } elseif ($Name.ToLower() -eq "word") {
       Stop-Process -Name "WINWORD"
     } elseif ($Name.ToLower() -eq "edge") {
@@ -184,7 +226,7 @@ function Close-Application {
     } elseif ($Name.ToLower() -eq "all") {
     "POWERPNT", "EXCEL", "WINWORD", "Msedge", "Code - Insiders", "qbittorrent", 
     "SnippingTool", "teams", "explorer", "Capture", "LP_Calculator", "outlook",
-    "Move Mouse", "FoxitPDFReader"
+    "Move Mouse", "FoxitPDFReader", "Code"
     | ForEach-Object { Stop-Process -Name "$_" -ErrorAction Ignore }
     } else {
       Write-Output "Application not found."
@@ -201,11 +243,10 @@ function Ohayou {
   
   process {
     "http://192.168.63.9/elog/", "https://webportal.global-imi.com/CommonLogin/Login?sysid=pNm0fj7kDN%252FwtNs4mWRs7A%253D%253D", "https://webportal.global-imi.com/CommonLogin/Login?sysid=eWbbLBrMaUoYEjbv2Xy1wg%253D%253D", "https://bryndelltorio.kanbantool.com/b/751627#?", "http://phlagspfe1/TeamSites/DND/ph/SitePages/DD%20Process%20Revision%202017.aspx", "https://octopart.com/" | ForEach-Object { Start-Process microsoft-edge:$_ }
-    Start-Process "C:\Program Files (x86)\Microsoft Office\root\Office16\OUTLOOK.EXE" -WindowStyle Maximized
+    Start-Process "C:\Program Files\Microsoft Office\root\Office16\OUTLOOK.EXE" -WindowStyle Maximized
     $_ohayouTmp = $HOME -split '\\'
     $_ohayouTmp = $_ohayouTmp[$_ohayouTmp.Length -1]
     Write-Output "Good morning $_ohayouTmp!"
-    Remove-Variable _ohayouTmp
   }
 }
 
