@@ -107,7 +107,7 @@ function Build-Project {
       else {
         New-item -Name $Name -Path . -ItemType Directory -ErrorAction Ignore
         "Docs", "Datasheet", "PCB", "Schematic" | ForEach-Object { New-item -Name "$_" -Path ".\$Name" -ItemType "Directory" -ErrorAction "Ignore" }
-        "Footprint", "Pad" | ForEach-Object { New-item -Name "$_" -Path ".\$Name\PCB" -ItemType "Directory" -ErrorAction "Ignore" }
+        "Footprint", "Pad", "Gerber" | ForEach-Object { New-item -Name "$_" -Path ".\$Name\PCB" -ItemType "Directory" -ErrorAction "Ignore" }
         "BackUp", "Version", "Report", "Upload", "Reference", "Pictures" | ForEach-Object { New-Item -Name "$_" -Path ".\$Name\Docs" -ItemType "Directory" -ErrorAction "Ignore" }
         "Schematic", "Report" | ForEach-Object {  New-item -Name "$_" -Path ".\$Name\Docs\BackUp" -ItemType "Directory" -ErrorAction "Ignore"; New-item -Name "$_" -Path ".\$Name\Docs\Upload" -ItemType "Directory" -ErrorAction "Ignore"; }
         Write-Output "`n[$Name project sub-folders generated.]"
