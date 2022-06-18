@@ -1,5 +1,5 @@
 #Import-Module 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\src\posh-git.psd1'
-Add-PoshGitToProfile
+Add-PoshGitToProfile -Force
 
 #variable defined for quick folder switch.
 [string]$prjDir = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\"
@@ -7,6 +7,7 @@ Add-PoshGitToProfile
 [string]$dirPrj1 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Control\Schematic\*.opj"
 [string]$dirPrj2 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSSTI02_Sentinel\Schematic\*.opj"
 [string]$dirPrj3 = "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Projects\DSACM01\Schematic\*.opj"
+$scrnLock = "~\Documents\WindowsPowerShell\ScreenLock-stopper.ps1"
 # First system config for windows 10.
 function toff { shutdown /p }
 Set-Alias shortcut 'toff'
@@ -15,7 +16,7 @@ Set-Alias shortcut 'reset'
 function openPsAdmin { 
   Start-Process -Filepath "powershell" -Verb runas -WindowStyle Maximized 
   }
-Set-Alias -name admin -value openPsAdmin
+Set-Alias -name admin -value openPsAdmn
 function cdMovies {
   Set-Location C:\Movies
   }
@@ -116,6 +117,23 @@ function Build-Project {
       Write-Warning "Check project location."
     }
   }
+}
+
+function Remove-GitFolder {
+
+  param (
+    [string]$Name
+  )
+  process {
+    if(Test-Path("$Name/.git")) {
+    Remove-Item -Force $Name/.git;
+    Remove-Item -Force $Name;
+    } else {
+      Write-Output "$Name not found."
+    }
+  }
+
+
 }
 
 function Open-Application {
@@ -226,8 +244,7 @@ function Close-Application {
     } elseif ($Name.ToLower() -eq "all") {
     "POWERPNT", "EXCEL", "WINWORD", "Msedge", "Code - Insiders", "qbittorrent", 
     "SnippingTool", "teams", "explorer", "Capture", "LP_Calculator", "outlook",
-    "Move Mouse", "FoxitPDFReader", "Code"
-    | ForEach-Object { Stop-Process -Name "$_" -ErrorAction Ignore }
+    "Move Mouse", "FoxitPDFReader", "Code" | ForEach-Object { Stop-Process -Name "$_" -ErrorAction Ignore }
     } else {
       Write-Output "Application not found."
     }
@@ -267,3 +284,17 @@ if (Test-Path($ChocolateyProfile)) {
 #>
 
 #. 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\install.ps1'
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
