@@ -166,14 +166,14 @@ function Open-Application {
       Start-Process "snippingtool"
     } elseif ($Name -eq "pcb") {
       Start-Process "C:\Cadence\SPB_17.2\tools\bin\allegro.exe"
-    } elseif ($Name -eq "sch") {
+    } elseif ($Name -eq "capture") {
       Start-Process "C:\Cadence\SPB_17.2\tools\bin\capture.exe"
     } elseif ($Name -eq "pad") {
       Start-Process "C:\Cadence\SPB_17.2\tools\bin\padstack_editor.exe"
-    } elseif ($Name -eq "lp") {
-      Start-Process "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Software\LP Calculator V2010\LP_Calculator.exe"
+    } elseif ($Name -eq "landpat") {
+      Start-Process "D:\installers\LP Calculator V2010\LP_Calculator.exe"
     } elseif ($Name -eq "saturn") {
-      Start-Process "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Saturn PCB Toolkit\PCB Toolkit V8.01.lnk"
+      Start-Process "C:\Saturn PCB Design\PCB Toolkit V8\PCB Toolkit V8.21.exe"
     } elseif ($Name -eq "bom") {
       Start-Process "$HOME\OneDrive - Integrated Micro-Electronics Inc\Design\Cadence Configuration reference\BOM processing tool.xlsm"
     } elseif ($Name -eq "word") {
@@ -208,6 +208,10 @@ function Open-Application {
       Start-Process "C:\Program Files (x86)\Edrawsoft\EdrawMax\EdrawMax.exe"
     } elseif ($Name -eq "gitmind") {
       Start-Process "C:\Program Files (x86)\Apowersoft\GitMind\GitMind.exe"
+    } elseif ($Name -eq "pcblib") {
+      Start-Process "C:\Cadence\SPB_17.2\share\local\pcb\symbols"
+    } elseif ($Name -eq "steplib") {
+      Start-Process "c:\cadence\spb_17.2\share\local\pcb\step"
     } else {
       Write-Warning "[$Name not found.]" 
     }
@@ -294,6 +298,186 @@ if (Test-Path($ChocolateyProfile)) {
 #>
 
 #. 'C:\tools\poshgit\dahlbyk-posh-git-9bda399\install.ps1'
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
+Import-Module posh-git
+
 Import-Module posh-git
 
 Import-Module posh-git
