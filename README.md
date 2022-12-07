@@ -1,6 +1,7 @@
 # Notes
 
-### ERROR FIXED
+## ERROR FIXED
+
 Date: **December 7, 2022**
 Time: **4:10 pm**
 
