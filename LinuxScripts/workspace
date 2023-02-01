@@ -1,24 +1,26 @@
-#!/usr/bin/env zsh
-#This script will automatically set up a workspace tmux layout.
-#Based on the script written by Martin Tournoji
-#Ref: https://www.arp242.net/tmux.html
+#! /usr/bin/env zsh
+
 
 att() {
-	[ -n "${TMUX:-}" ] &&
-		tmux switch-client -t '=CODE' ||
-		tmux attach-session -t '=CODE'
-	}
+    [ -n "${TMUX:-}"] &&
+        tmux switch-client -t '=TERMINAL' ||
+        tmux attach-session -t '=TERMINAL'
+    }
 
-if tmux has-session -t '=CODE'; then
-	att
-	exit 0
+if tmux has-session -t '=TERMINAL'; then
+    att
+    exit 0
 fi
 
-tmux new-session -d -s CODE -n Fun -c /mnt/c/Users/GAIA/Documents/Project
-
-tmux new-window -n Terminal -c /mnt/c/Users/GAIA/Documents/Project
-tmux new-window -n Arduino -c /mnt/c/Users/GAIA/Documents/Project
-tmux send-keys -t "=CODE:=Arduino" "tmux split-window -v -c /mnt/c/Users/GAIA/Documents/Project && tmux resize-pane -D 12 && tmux select-pane -U && clear && fortune | cowsay -f ghostbusters" Enter
-tmux send-keys -t "=CODE:=Fun" "watch -n 10 happyghost" Enter
+tmux new-session -d -s TERMINAL -n CODE
+tmux send-keys -t "=TERMINAL:=CODE" "tmux split-window -h; tmux resize-pane -R 20; tmux detach-client" Enter
+sleep 0.1
+tmux send-keys -t "TERMINAL:0.0" cmatrix Enter
+sleep 1
+tmux send-keys -t "TERMINAL:0.1" MoveMouse Enter
+tmux attach-session -t TERMINAL
 
 att
+
+### Fix the bug! movemouse should execute in your right hand side.
+

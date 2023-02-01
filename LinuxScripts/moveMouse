@@ -1,0 +1,11 @@
+# !/bin/bash
+# Create an alias inside ~/.zshrc file to access the script
+# Use chmod +x <file name> to make the file executable.
+
+while true 
+do
+    clear
+    xdotool mousemove_relative 0-360 1
+    fortune | cowsay -f tux
+    sleep 10
+done
